@@ -19,11 +19,24 @@ def grabID(gamename, tag):
         puuid = data['puuid']
         gameName = data['gameName']
         tagLine = data['tagLine']
-        
-        print("PUUID:", puuid)
-        print("Game Name:", gameName)
-        print("Tag Line:", tagLine)
     else:
-        print("Error:", response.status_code)
-    
-grabID("proxysinged", "oce")
+        print("Error Grabbing ID, check user name or tag:", response.status_code)
+
+    return puuid
+
+def grabMatchID(startTime, endTime, queue, type, start, count):
+        id = grabID("proxysinged", "oce")
+
+        if id: 
+            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?start={startTime}&count={count}&api_key={API_KEY}"
+            print(request_url)
+            response = requests.get(request_url)
+
+            if response.status_code == 200:
+                data=response.json()
+                matches=data
+                print(matches)
+            else:
+                print("Error grabbing matches:", response.status_code)
+
+grabMatchID(0, 0, 0, 0, 0, 20)
