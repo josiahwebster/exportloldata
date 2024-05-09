@@ -30,7 +30,7 @@ def grabMatchID(startTime, endTime, queue, type, start, count):
         id = grabID("proxysinged", "oce")
 
         if id: 
-            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?start={startTime}&type={type}&count={count}&api_key={API_KEY}"
+            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?startTime={startTime}&type={type}&count={count}&api_key={API_KEY}"
             response = requests.get(request_url)
 
             if response.status_code == 200:
@@ -80,7 +80,8 @@ def findUserData(data, userID):
 # Grab users data for 100 games (max api call)
 # only includes ranked matches
 def grabCurrentSeasonData():
-    seasonStartDate = '0'
+    # Jan 9, 2024 season start
+    seasonStartDate = '1704805200'
     currentDate = time.time()
     queue = ''
     gameType = 'ranked'
@@ -94,7 +95,4 @@ def grabCurrentSeasonData():
             print(matchID[i])
             grabMatchInfo(matchID[i])
         
-
-# grabMatchID(0, 0, 0, 0, 0, 20)
-# grabMatchInfo("OC1_615185332")
 grabCurrentSeasonData()
