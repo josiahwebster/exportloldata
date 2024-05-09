@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+import time
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
@@ -29,12 +30,14 @@ def grabMatchID(startTime, endTime, queue, type, start, count):
         id = grabID("proxysinged", "oce")
 
         if id: 
-            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?start={startTime}&count={count}&api_key={API_KEY}"
+            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?start={startTime}&type={type}&count={count}&api_key={API_KEY}"
             response = requests.get(request_url)
 
             if response.status_code == 200:
                 data=response.json()
-                matches=data
+                print("data")
+                print(data)
+                return data
                 
             else:
                 print("Error grabbing matches:", response.status_code)
@@ -55,7 +58,8 @@ def grabMatchInfo(matchID):
             participants = data['info']['participants']
             participantData = findUserData(data, id)
             if participantData:
-                print(participantData)
+                print("Participant data found")
+                # print(participantData)
             else:
                 print("Participant not found in this match")
         else:
@@ -73,5 +77,24 @@ def findUserData(data, userID):
         print("User is not in the given match")
         return 0
 
-grabMatchID(0, 0, 0, 0, 0, 20)
-grabMatchInfo("OC1_615185332")
+# Grab users data for 100 games (max api call)
+# only includes ranked matches
+def grabCurrentSeasonData():
+    seasonStartDate = '0'
+    currentDate = time.time()
+    queue = ''
+    gameType = 'ranked'
+    start = 0
+    count = 100
+
+    matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, 0, count)
+
+    for i in range(100):
+        if matchID[i] != 0:
+            print(matchID[i])
+            grabMatchInfo(matchID[i])
+        
+
+# grabMatchID(0, 0, 0, 0, 0, 20)
+# grabMatchInfo("OC1_615185332")
+grabCurrentSeasonData()
