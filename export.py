@@ -50,13 +50,10 @@ def grabMatchInfo(matchID):
 
     if response.status_code == 200:
         data = response.json()
-
         
         if 'info' in data and 'participants' in data['info']:
             participants = data['info']['participants']
-            
-            participantData = findMatchingID(data, id)
-            
+            participantData = findUserData(data, id)
             if participantData:
                 print(participantData)
             else:
