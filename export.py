@@ -30,13 +30,11 @@ def grabMatchID(startTime, endTime, queue, type, start, count):
         id = grabID("proxysinged", "oce")
 
         if id: 
-            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?startTime={startTime}&type={type}&count={count}&api_key={API_KEY}"
+            request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/by-puuid/{id}/ids?startTime={startTime}&type={type}&start={start}&count={count}&api_key={API_KEY}"
             response = requests.get(request_url)
 
             if response.status_code == 200:
                 data=response.json()
-                print("data")
-                print(data)
                 return data
                 
             else:
@@ -77,22 +75,36 @@ def findUserData(data, userID):
         print("User is not in the given match")
         return 0
 
-# Grab users data for 100 games (max api call)
-# only includes ranked matches
+# Grab users data for 100 games at a time (max api call)
+# use variable cycle to persist until the match history is exhausted
+# only includes ranked matches from the current season (hardcoded as Jan 9)
 def grabCurrentSeasonData():
-    # Jan 9, 2024 season start
+    # Jan 9, 2024 season start 
+    # 6 required parameters according to API
     seasonStartDate = '1704805200'
     currentDate = time.time()
     queue = ''
     gameType = 'ranked'
     start = 0
-    count = 100
+    count = 5
+    # cycle variable
+    cycle = 0
 
-    matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, 0, count)
+    for x in range (5):
+        matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle, count)
+        for i in range(cycle * x, cycle):
+            if matchID[i] != 0:
+                print(matchID[i])
+                grabMatchInfo(matchID[i])
+            if matchID[i] != 0:
+                print("Match history exhausted")
+                return 0;
+        cycle += 1
 
-    for i in range(100):
-        if matchID[i] != 0:
-            print(matchID[i])
-            grabMatchInfo(matchID[i])
+        # check if at least one match exists past the current set of 100
+        if grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle + 1, count) == 0:
+            print("Match history exhausted")
+            return 0;
+
         
 grabCurrentSeasonData()
