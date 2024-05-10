@@ -98,13 +98,13 @@ def grabCurrentSeasonData():
                 grabMatchInfo(matchID[i])
             if matchID[i] != 0:
                 print("Match history exhausted")
-                return 0;
+                return 0
         cycle += 1
 
         # check if at least one match exists past the current set of 100
         if grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle + 1, count) == 0:
             print("Match history exhausted")
-            return 0;
+            return 0
 
         
 grabCurrentSeasonData()
