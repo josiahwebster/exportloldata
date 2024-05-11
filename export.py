@@ -2,6 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import time
+import pandas as pd
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
@@ -90,13 +91,18 @@ def grabCurrentSeasonData():
     # cycle variable
     cycle = 0
 
-    for x in range (5):
+    data = pd.DataFrame(columns=['MatchID', "Result"])
+
+    for x in range (1):
         matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle, count)
-        for i in range(cycle * x, cycle):
+        print(matchID)
+        for i in range(0, len(matchID)):
             if matchID[i] != 0:
                 print(matchID[i])
                 grabMatchInfo(matchID[i])
-            if matchID[i] != 0:
+                data.loc[i] = [matchID[i], 'Test']
+                print(data)
+            if matchID[i] == 0:
                 print("Match history exhausted")
                 return 0
         cycle += 1
@@ -105,6 +111,13 @@ def grabCurrentSeasonData():
         if grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle + 1, count) == 0:
             print("Match history exhausted")
             return 0
-
+        
+    #load data into a DataFrame object:
+    df = pd.DataFrame(data)
+    print(df) 
+    file_name = 'lolData.xlsx'
+        
+    # saving the excel
+    data.to_excel(file_name)
         
 grabCurrentSeasonData()
