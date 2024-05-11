@@ -77,7 +77,7 @@ def findUserData(data, userID):
 
 # Grab users data for 100 games at a time (max api call)
 # use variable cycle to persist until the match history is exhausted
-# only includes ranked matches from the current season (hardcoded as Jan 9)
+# only includes ranked matches from the current season (hardcoded as Jan 9 2024)
 def grabCurrentSeasonData():
     # Jan 9, 2024 season start 
     # 6 required parameters according to API
@@ -86,38 +86,35 @@ def grabCurrentSeasonData():
     queue = ''
     gameType = 'ranked'
     start = 0
-    count = 5
+    count = 100
     # cycle variable
     cycle = 0
 
-    data = pd.DataFrame(columns=['MatchID', 'Win', 'Duration'])
+    data = pd.DataFrame(columns=['MatchID', 'Win', 'Duration', 'Kills', 'Deaths', 'Assists', 'Damage Dealt to Champions'])
 
-    for x in range (1):
-        matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle, count)
-        print(matchID)
+    for x in range (50):
+        matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle * 100, count)
+        # print(matchID)
         for i in range(0, len(matchID)):
             if matchID[i] != 0:
                 matchInfo = grabMatchInfo(matchID[i])
                 gameResult = matchInfo['win']
                 gameDuration = matchInfo['timePlayed']
-                data.loc[i] = [matchID[i], gameResult, gameDuration]
-                print(data)
+                playerKills = matchInfo['kills']
+                playerDeaths = matchInfo['assists']
+                playerAsissts = matchInfo['deaths']
+                playerDamage = matchInfo['totalDamageDealtToChampions']
+                data.loc[i + (cycle * count)] = [matchID[i], gameResult, gameDuration, playerKills, playerDeaths, playerAsissts
+                                                 , playerDamage]
+            
             if matchID[i] == 0:
                 print("Match history exhausted")
                 return 0
         cycle += 1
-
-        # check if at least one match exists past the current set of 100
-        if grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle + 1, count) == 0:
-            print("Match history exhausted")
-            return 0
         
-    #load data into a DataFrame object:
     df = pd.DataFrame(data)
     print(df) 
     file_name = 'lolData.xlsx'
-        
-    # saving the excel
     data.to_excel(file_name)
         
 grabCurrentSeasonData()
