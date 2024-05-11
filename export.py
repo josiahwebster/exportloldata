@@ -45,7 +45,6 @@ def grabMatchID(startTime, endTime, queue, type, start, count):
 # Participant = 10 users in a given match
 def grabMatchInfo(matchID):
     id = grabID("proxysinged", "oce")
-    print("USERID: " + id)
 
     request_url = f"{MATCH_REGION_URL}/lol/match/v5/matches/{matchID}?api_key={API_KEY}"
     response = requests.get(request_url)
@@ -56,9 +55,9 @@ def grabMatchInfo(matchID):
         if 'info' in data and 'participants' in data['info']:
             participants = data['info']['participants']
             participantData = findUserData(data, id)
+            return participantData
             if participantData:
                 print("Participant data found")
-                # print(participantData)
             else:
                 print("Participant not found in this match")
         else:
@@ -91,16 +90,17 @@ def grabCurrentSeasonData():
     # cycle variable
     cycle = 0
 
-    data = pd.DataFrame(columns=['MatchID', "Result"])
+    data = pd.DataFrame(columns=['MatchID', 'Win', 'Duration'])
 
     for x in range (1):
         matchID = grabMatchID(seasonStartDate, currentDate, queue, gameType, cycle, count)
         print(matchID)
         for i in range(0, len(matchID)):
             if matchID[i] != 0:
-                print(matchID[i])
-                grabMatchInfo(matchID[i])
-                data.loc[i] = [matchID[i], 'Test']
+                matchInfo = grabMatchInfo(matchID[i])
+                gameResult = matchInfo['win']
+                gameDuration = matchInfo['timePlayed']
+                data.loc[i] = [matchID[i], gameResult, gameDuration]
                 print(data)
             if matchID[i] == 0:
                 print("Match history exhausted")
